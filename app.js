@@ -13,8 +13,7 @@ app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "client", "dist")));
 
- const url = `https://lfyjoewruhdwxwxzhzba.supabase.co`
- const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmeWpvZXdydWhkd3h3eHpoemJhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkzNzUzNTYsImV4cCI6MjA1NDk1MTM1Nn0.O5fqaqfXKn2pQxSxfocIYScT8I_eEZQDCgjBmtFVxW4'
+
 
 
 
