@@ -15,18 +15,24 @@ const Login = () => {
   })
 
   const handleClick=(e)=>{
-    e.preventDefault();
+
    setClicked(!clicked);
+
   }
 
   const handleChange=(e)=>{
+
     e.preventDefault()
-    setForm({...form,[e.target.value]:e.target.value})
+
+    setForm({...form,[e.target.name]:e.target.value})
+
   }
 
   const handleSubmit=(e)=>{
+
     e.preventDefault();
-    fetch('https://localhost:8080/Login',{
+
+    fetch('http://localhost:8080/Login',{
       method:"POST",
       headers:{
         'Content-Type':'application/json'
@@ -35,29 +41,56 @@ const Login = () => {
     })
     .then((res)=>res.json())
     .then((result)=>{
+
       if(result)
         nav("/");
+
     })
     .catch((error)=>{
+
       toast.success("Wrong email or incorrect password!");
+
       console.log("Error-> ",error);
+
     })
     }
     
 
   return (
+
     <div>
+
       <form onSubmit={handleSubmit}>
-       <label>Reistered email: </label>
-       <input required type="email" id="email" name="email" onChange={handleChange}/>
+
+       <label>Registered email: </label>
+       <input 
+       required 
+       type="email" id="email"
+        name="email" 
+        onChange={handleChange}
+        />
+       
        <label>Your Password: </label>
-       <input required type={clicked?"text":"password"} onChange={handleChange} id="password" name="password"/>
-        <input type="checkbox" onClick={handleClick}/>
+       <input required
+        type={clicked?"text":"password"} id="password"
+         onChange={handleChange} 
+          name="password"
+          />
+        
+        <input 
+        type="checkbox" 
+        onClick={handleClick}
+        />
         <label>Show password</label>
+       
        <input type="submit"/>
+
       </form>
+      
       <ToastContainer/>
+    
     </div>
+
   )
 }
 

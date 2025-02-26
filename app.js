@@ -2,20 +2,24 @@ const {createClient}  = require("@supabase/supabase-js");
 const express = require("express");
 const app = express();
 const dotenv=require('dotenv')
-dotenv.config
+dotenv.config()
 const path = require("path");
 const bp = require('body-parser');
-const cors=require('cors')
+const cors=require('cors');
+
+
+
 
 app.use(express.json()); 
-app.use(cors());
+app.use(cors())
 app.use(bp.json());
 app.use(bp.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "client", "dist")));
 
 
 
-
+const url = process.env.VITE_SUPABASE_URL;
+const key = process.env.VITE_SUPABASE_KEY;
 
 //connection with DataBase
 
@@ -32,28 +36,59 @@ app.get("/", (req, res) => {
 
 app.post("/Signup",async(req,res)=>{
 
-const {email,password,Pass} = req.body;
-if(password!=Pass)
-  return res.send(769);
-
+const email=req.body.email
+const password=req.body.password;
+const pass=req.body.Pass;
+           
             const {data,error} = await supabase
+                                 .from("User")
+                                 .select("*")
+                                 .eq('UserName',email);
+
+              //console.log(data);
+
+              if(Object.keys(data).length>0)
+          {
+           return res.send({});
+          }
+
+          if(password!=pass)
+          return res.send(769);
+
+
+            const {data:dat,error:err} = await supabase
                                .from("User")
                                .insert([{
                                 UserName:email,
                                 Password_1:password
                               }]).select()
-            console.log(error);  
-            res.send({user:email,p1:password,p2:Pass});
+            console.log(err);  
+            res.send({user:email,p1:password,p2:pass});
+                            
               });
 
 
 //Login-route
 
-app.post("/Login",(req,res)=>{
-const {email,password}=req.body;
+app.post('/Login',async(req,res)=>{
+
+const email =  req.body.email;
+const pass =  req.body.password;
+
+  const {data,error} = await supabase
+                                 .from("User")
+                                 .select("*")
+                                 .eq('UserName',email)
+                                 .eq('Password_1',pass)
+
+            console.log(data);                     
+
+            if(Object.keys(data).length==0)
+              return res.send(100);
+            else
+              return res.send({user:data,p1:pass});
 
 });
-
 
 
 
