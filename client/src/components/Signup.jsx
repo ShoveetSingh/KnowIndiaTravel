@@ -1,17 +1,17 @@
 import React from 'react'
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {toast, ToastContainer} from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css"
-import isEmpty from "lodash/isEmpty"
+import '../index.css'
+import {Dark} from './'
 
 const Signup = () => {
 
   const [clicked,setClicked]=useState(false);
 
-   const nav=useNavigate();
 
   const [form,setForm] = useState({
+    username:'',
     email:'',
     password:'',
     Pass:''
@@ -50,15 +50,12 @@ body: JSON.stringify(form)
 .then((res) => res.json())
 .then((result)=>{
 
-  if(isEmpty(result))
-    toast.success("User Already Exist");
-    else
-    nav("/");
+toast.success(result.message);  
 
 })
 .catch((error)=>{
 
-   toast.success("Password do not match");
+   toast.success("Internal Error");
 
   console.log("Error->  ",error);
 
@@ -70,8 +67,17 @@ body: JSON.stringify(form)
   return (
     
     <div>
-
+      <Dark/>
       <form onSubmit={handleSubmit}>
+
+       <label>UserName*:</label>
+       <input
+       required
+       type='text' id='username'
+       placeholder="bob"
+       name='username'
+       onChange={handleChange}
+       ></input>
 
         <label >Email*: </label>
         <input 

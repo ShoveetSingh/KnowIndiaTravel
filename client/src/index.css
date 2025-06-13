@@ -1,0 +1,18 @@
+body {
+    background-color: white;
+    color: black;
+  }
+
+
+.app{
+
+    text-align: center;
+    padding: 100px;
+    font-family: sans-serif;
+
+}
+
+body.dark {
+    background-color: #121212;
+    color: white;
+  }
