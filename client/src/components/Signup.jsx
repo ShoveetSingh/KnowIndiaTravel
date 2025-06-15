@@ -8,7 +8,8 @@ import {Dark} from './'
 const Signup = () => {
 
   const [clicked,setClicked]=useState(false);
-
+  
+  
 
   const [form,setForm] = useState({
     username:'',
@@ -113,7 +114,7 @@ toast.success(result.message);
        
         <input type="submit"/>
       </form>
-      
+  
       <ToastContainer/>
     
     </div>

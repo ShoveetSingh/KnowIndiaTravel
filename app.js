@@ -151,17 +151,6 @@ return res.send({
 });
 
 
-//Google Sign-In route
-app.post('/auth',async(req,res)=>{
-
-const {data,error} = await supabase.auth.signIn.WithOAuth({
-
-provider:'google',
-
-})
-
-})
-
 //Password Update Route
 app.get("/Update",async(req,res)=>{
 
@@ -195,34 +184,6 @@ const {data,error:err} = await supabase.auth.admin.updateUserById(
 }
                                
 )
-
-
-const {data:insert,error:new_err} = await supabase
-                                          .from("User")
-                                          .update({Password_1:password})
-                                          .eq('UserName',user_name)
-                                          .select("*")
-
-          if(!insert){
-          console.log(new_err);
-          res.send({})
-          }
-          else{
-            res.send({
-              email:user_name,
-              pass:password
-            })
-          }
-
-
-})
-
-
- //Singing out route
-app.get("/Signout",async(req,res)=>{
-
-
-
 })
 
 
