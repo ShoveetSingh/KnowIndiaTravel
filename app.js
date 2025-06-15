@@ -57,8 +57,7 @@ if(data && Object.keys(data).length>0){
 return res.json({message:"UserName is already taken."})
 
 }
-                      
-
+       
            //email authentication
           const {data:authdata,error:autherror} = await supabase.auth.signUp({
             
@@ -81,18 +80,23 @@ return res.json({message:"UserName is already taken."})
 
            console.log(authdata);
            //data insertion
-
-           // write code to check whether the email already registered or not.
-            const {data:dat,error:err} = await supabase
+            //  // write code to check whether the email already registered or not.
+                  
+        const {data:dat,error:err} = await supabase
                                                .from("TRAVEL")
                                                .select("*")
                                                .eq("Email",useremail);
 
-            if(dat){
+            if(Object.keys(dat).length>0){
               console.log(dat);
               return res.send({message:"User already Exist.Please Login"});
 
             }
+            else if (err){
+              console.log(err);
+            }
+            else{
+               
             
             const {data:newdata,error:newerror} = await supabase
                                                         .from("TRAVEL")
@@ -111,7 +115,7 @@ return res.json({message:"UserName is already taken."})
             };
                
           }
-
+        }
                });
 
 //Login-route apply cookies as well.
