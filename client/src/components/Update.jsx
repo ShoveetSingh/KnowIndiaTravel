@@ -1,32 +1,42 @@
 import {React,useState} from 'react'
 import { ToastContainer,toast } from 'react-toastify'
-import { useNavigate } from 'react-router-dom'
 
 
 const Update = () => {
 
-   const navigate=useNavigate(); 
+   const[form,setForm]=useState({
+    email:''
+  })
 
-   const[From,setForm]=useState({
 
-     email:'',
-     password:''
-     
-   })
-
-   const[Click,setClick]=useState(false)
 
    const handleChange =(e)=>{
-       
+    e.preventDefault();
+    
+    setForm({...form,[e.target.name]:e.target.value})
    
-
+    
    }
 
-   const handleSubmit=(e)=>{
+   const handleSubmit= (e)=>{
 
      e.preventDefault();
-     fetch('',{
-
+     console.log(form);
+    fetch('http://localhost:8080/Update',{
+      method:"POST",
+      headers:{
+        'Content-Type':"application/json"
+      },
+        body:JSON.stringify(form)
+     })
+     .then((res)=> res.json())
+     .then((result)=>{
+         toast.success(result.message);
+     })
+     .catch((error)=>{
+      console.log(error);
+      
+      toast.success("Internal error");
      })
 
    }
@@ -39,26 +49,17 @@ const Update = () => {
             <label>Email:</label>
             <br/>
          <input 
+         required id="email"
          type="email"
          placeholder="your registered email"
-         id="email"
+         name="email"
         onChange={handleChange}
          />
          <br/>
 
-         <label>New password:</label>
-         <br/>
-         <input type="password"
-         id="password"
-         onChange={handleChange}
-         />
-        <br/>
-
         <input type='submit' value="Submit"/>
-
-
         </form>
-
+        <ToastContainer/>
     </div>
   )
 }

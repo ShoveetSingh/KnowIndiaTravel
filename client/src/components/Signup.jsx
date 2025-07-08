@@ -4,25 +4,35 @@ import {toast, ToastContainer} from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css"
 import '../index.css'
 import {Dark} from './'
+import 'react-phone-number-input/style.css'
+import PhoneInput from 'react-phone-number-input'
+
+
 
 const Signup = () => {
 
   const [clicked,setClicked]=useState(false);
   
-  
+
+  const [value,setValue] = useState('');  
 
   const [form,setForm] = useState({
     username:'',
     email:'',
     password:'',
-    Pass:''
+    Pass:'',
+    country:'',
+    phone:'',
+    image:null,
   })
+
+
 
 
 
   const handleChange=(e)=>{
 
-    e.preventDefault();
+   // e.preventDefault();
 
     setForm({
       ...form,[e.target.name]:e.target.value
@@ -38,7 +48,8 @@ const Signup = () => {
   const handleSubmit =(e)=>{
 
    e.preventDefault();
-
+   form.phone=value;
+   console.log(form);
 
   fetch('http://localhost:8080/Signup',{
    method:"POST",
@@ -61,6 +72,25 @@ toast.success(result.message);
   console.log("Error->  ",error);
 
 })
+
+  }
+
+  const handleImageChange=(e)=>{
+
+   var file=e.target.files[0];
+  const reader = new FileReader();
+
+  reader.readAsDataURL(file);
+
+  reader.onloadend=()=>{
+   
+  setForm((prev)=>({
+    ...prev,
+    image:reader.result
+  })
+
+  )}
+
 
   }
 
@@ -111,8 +141,30 @@ toast.success(result.message);
         onClick={()=>clickhandler()}
         />
         <label>Show password</label>
+        <br></br>
        
-        <input type="submit"/>
+       <label>Country*:</label>
+       <input
+       required
+       type="text"
+       id="country" name="country"
+       onChange={handleChange}
+       />
+       <br></br>
+
+       <label>Contact*:</label>
+       <PhoneInput
+       required id="phone" name="phone"
+       placeholder="Enter your phone number."
+       value={value}
+       onChange={setValue}
+       />
+       <br></br>
+       
+
+       <input type="file" id="image" name="image" onChange={handleImageChange}/>
+
+        <input type="submit" value="Signup"/>
       </form>
   
       <ToastContainer/>

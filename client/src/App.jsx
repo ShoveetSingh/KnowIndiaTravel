@@ -8,13 +8,13 @@ function App() {
 
 
 const location = useLocation();
-const name = location.state?.name;
+const url = location.state?.name;
 
   return (
       <div >
-       <h1>Its working fine {name}</h1> 
+       {url?<img src={url} alt="image" height='400' width='400' />:"Hello Guest"}
         <Dark/>
-        {name?<Signout/>:<a href="/Login">Login</a>}
+        {url?<Signout/>:<a href="/Login">Login</a>}
         
        </div>
   )

@@ -6,7 +6,10 @@ dotenv.config()
 const path = require("path");
 const bp = require('body-parser');
 const cors=require('cors');
+
 const { status } = require("express/lib/response");
+
+
 
 
 app.use(express.json()); 
@@ -23,6 +26,8 @@ const key = process.env.VITE_SUPABASE_KEY;
 //connection with DataBase
 const supabase = createClient(url,key);
 
+
+
 //Home-route
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
@@ -36,6 +41,17 @@ const username=req.body.username;
 const useremail=req.body.email
 const userpassword=req.body.password;
 const userpass=req.body.Pass;
+const usercountry=req.body.country;
+const userphone=req.body.phone;
+
+
+const {image}=req.body;
+
+const base64data = image.replace(/^data:image\/\w+;base64,/, "");
+const buffer = Buffer.from(base64data,"base64");
+
+const fileExt = image.match(/^data:image\/(\w+);base64,/)[1];
+ const fileName = `${Date.now()}.${fileExt}`;
 
 
 if(userpassword!=userpass){
@@ -46,9 +62,9 @@ if(userpassword!=userpass){
           
                          
 const { data, error } = await supabase
-  .from("TRAVEL")
-  .select("*")
-  .eq("UserName", username);
+    .from("TRAVEL")
+    .select("*")
+    .eq("UserName", username);
 
 
 
@@ -63,9 +79,12 @@ return res.json({message:"UserName is already taken."})
             
             email:useremail,
             password:userpassword,
+
             options:{
               data:{
+                phone:userphone,
                 first_name:username,
+                country:usercountry,
               },
             }
           })
@@ -80,7 +99,8 @@ return res.json({message:"UserName is already taken."})
 
            console.log(authdata);
            //data insertion
-            //  // write code to check whether the email already registered or not.
+
+             // write code to check whether the email already registered or not.
                   
         const {data:dat,error:err} = await supabase
                                                .from("TRAVEL")
@@ -96,13 +116,28 @@ return res.json({message:"UserName is already taken."})
               console.log(err);
             }
             else{
-               
+             
+              const {data:idata,error:ierror} = await supabase
+                                              .storage
+                                              .from("tourist-profile-pics")
+                                              .upload(fileName,buffer,{
+                                                contentType:`image/${fileExt}`,
+                                              });
+              
+            console.log(idata);
+            console.log(ierror);
+
+            if(ierror)
+              res.send({message:ierror.message})
             
             const {data:newdata,error:newerror} = await supabase
                                                         .from("TRAVEL")
                                                         .insert([{
                                 'UserName':username,
                                 'Email':useremail,
+                                'Country':usercountry,
+                                'Phone number':userphone,
+                                'path':fileName,
                                                          }]).select()
 
             if(newerror){        
@@ -111,8 +146,9 @@ return res.json({message:"UserName is already taken."})
             }
             else
             {
-              res.send({message:"Email sent"})
-            };
+
+            res.send({message:"Email sent"})
+             };
                
           }
         }
@@ -126,7 +162,6 @@ const pass =  req.body.password;
 
 
   
-
   const {data,error} = await supabase.auth.signInWithPassword({
 
     email:email,
@@ -134,15 +169,6 @@ const pass =  req.body.password;
 
   })
 
-
-
-if(data){
-  const name = data.user.user_metadata.first_name;
-return res.send({
-  message:name
-})
-
-}
 if(error){
 console.log(error);
 return res.send({
@@ -152,42 +178,54 @@ return res.send({
 
 }
 
+
+
+if(data){
+ // const name = data.user.user_metadata.first_name;
+  
+  const { data:filePath, error:e } = await supabase
+    .from("TRAVEL")
+    .select("path")
+    .eq("Email", email);
+
+  const { data:dat } = supabase.storage.from('tourist-profile-pics')
+                       .getPublicUrl(filePath[0].path) 
+
+return res.send({
+
+  message:dat.publicUrl
+})  
+
+}
+
+
 });
 
 
-//Password Update Route
-app.get("/Update",async(req,res)=>{
+//Email confrimation Route
+app.post('/Update',async(req,res)=>{
 
-const user_name=req.body.username;
-const password=req.body.password;
+const user_email=req.body.email;
+
+if(user_email){
 
 
-if(password.toString().length<8){
- 
-res.json({
-  message:'password too small must be greater than or equal to 8 characters'
+const {data,error} = await supabase.auth.resetPasswordForEmail(
+ user_email,
+ { redirectTo:"http://localhost:5173/Password",
 })
 
+if(error){
+  console.log(error);
+res.send({message:error.message});
 }
-
-const { data: users , error } = await supabase.auth.admin.listUsers({
-  username:user_name
-})
-
-if(users)
-  console.log(users);
 else
-console.log(error);
+res.send({message:"Password reset link sent"});
 
-//var id=;
-
-const {data,error:err} = await supabase.auth.admin.updateUserById(
-  id,
-{
-    password:password
 }
-                               
-)
+else
+console.log("NO email");
+
 })
 
 
