@@ -2,8 +2,8 @@ import React from 'react'
 import { useState } from 'react'
 import { ToastContainer,toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
-
-
+import GoogleAuth from './GoogleAuth'
+import FacebookAuth from './FacebookAuth'
 
 
 const Login = () => {
@@ -89,7 +89,10 @@ const Login = () => {
        <input type="submit"/>
 
       </form>
-      
+      <br></br>
+      <GoogleAuth/>
+      <br></br>
+      <FacebookAuth/>
       <ToastContainer/>
     
     </div>

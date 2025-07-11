@@ -5,7 +5,17 @@ import ReactDOM from 'react-dom/client';
 import './index.css'
 import App from './App.jsx'
 
-import {Signup,Login,Update,Signout,Password,} from './components'
+import {
+        Signup,
+        Login,
+        Update,
+        Signout,
+        Password,
+        GoogleAuth,
+        FacebookAuth,
+        Admin
+} 
+from './components'
 
 import { Routes,Route } from 'react-router-dom'
 import { BrowserRouter as Router } from 'react-router-dom'
@@ -21,6 +31,9 @@ root.render(
         <Route path="/Update" element={<Update/>}></Route>
         <Route path="/Signout" element={<Signout/>}></Route>
         <Route path="/Password" element={<Password/>}></Route>
+        <Route path="/GoogleAuth" element={<GoogleAuth/>}></Route>
+        <Route path="/FacebookAuth" element={<FacebookAuth/>}></Route>
+        <Route path="/Admin" element={<Admin/>}></Route>
       </Routes>
     </Router>
   </React.StrictMode>,
