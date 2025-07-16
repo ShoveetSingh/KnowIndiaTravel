@@ -13,7 +13,8 @@ import {
         Password,
         GoogleAuth,
         FacebookAuth,
-        Admin
+        AdminLogin,
+        AdminPanel,
 } 
 from './components'
 
@@ -33,7 +34,8 @@ root.render(
         <Route path="/Password" element={<Password/>}></Route>
         <Route path="/GoogleAuth" element={<GoogleAuth/>}></Route>
         <Route path="/FacebookAuth" element={<FacebookAuth/>}></Route>
-        <Route path="/Admin" element={<Admin/>}></Route>
+        <Route path="/AdminLogin" element={<AdminLogin/>}></Route>
+        <Route path="/AdminPanel" element={<AdminPanel/>}></Route>
       </Routes>
     </Router>
   </React.StrictMode>,

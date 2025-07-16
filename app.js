@@ -7,11 +7,7 @@ const path = require("path");
 const bp = require('body-parser');
 const cors=require('cors');
 
-const { status } = require("express/lib/response");
-
-
-
-
+// const { status } = require("express/lib/response");
 app.use(express.json()); 
 app.use(cors())
 app.use(bp.json());
@@ -154,7 +150,7 @@ return res.json({message:"UserName is already taken."})
         }
                });
 
-//Login-route apply cookies as well.
+//Login-route
 app.post('/Login',async(req,res)=>{
 
 const email =  req.body.email;
@@ -181,7 +177,6 @@ return res.send({
 
 
 if(data){
- // const name = data.user.user_metadata.first_name;
   
   const { data:filePath, error:e } = await supabase
     .from("TRAVEL")
@@ -228,8 +223,36 @@ console.log("NO email");
 
 })
 
+//Admin Login-route
+app.post('/AdminLogin',async(req,res)=>{
 
+ const {admin_email,admin_password}=req.body;
 
-const PORT = process.env.PORT || 8080;
+ const {data,error} = await supabase.auth.signInWithPassword({
+
+    email:admin_email,
+    password:admin_password
+
+  })
+
+if(error){
+console.log(error);
+
+return res.send({
+  message:"Wrong credentials",  
+})
+
+}
+if(data){
+
+return res.send({
+  message:data.user.email
+})
+
+}
+
+})
+
+const PORT = process.env.PORT;
 
 app.listen(PORT, console.log(`Server started on port ${PORT}`));
