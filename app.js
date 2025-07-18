@@ -17,18 +17,18 @@ app.use(express.static(path.join(__dirname, "client", "dist")));
 
 const url = process.env.VITE_SUPABASE_URL;
 const key = process.env.VITE_SUPABASE_KEY;
-
+const secret = process.env.VITE_SUPABSE_SECRET_KEY;
 
 //connection with DataBase
 const supabase = createClient(url,key);
 
+const supabase2 = createClient(url,secret);
 
 
 //Home-route
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
 });
-
 
 //Signup-route
 app.post("/Signup",async(req,res)=>{
@@ -196,7 +196,6 @@ return res.send({
 
 });
 
-
 //Email confrimation Route
 app.post('/Update',async(req,res)=>{
 
@@ -249,6 +248,45 @@ return res.send({
   message:data.user.email
 })
 
+}
+
+})
+
+ // List User Route
+app.get('/UserList',async(req,res)=>{
+
+const { data:{users}, error } = await supabase2.auth.admin.listUsers();
+
+if(error)
+  res.json([]);
+res.json(users);
+
+})
+
+  // Delete User Route
+app.post('/DeleteUser',async(req,res)=>{
+
+const {identity,email}= req.body;
+
+const {data,error} =await supabase2.auth.admin.deleteUser(identity);
+
+if(data){
+
+const {data:dat,error:err} = await supabase
+  .from('TRAVEL')
+  .delete()
+  .eq('Email', email)
+  .select()
+
+if(err){
+  res.send({message:err.message});
+}
+if(dat)
+    res.send({message:"User deleted Successfully"});
+
+}
+if(error){
+    res.send({message:error.message});
 }
 
 })
