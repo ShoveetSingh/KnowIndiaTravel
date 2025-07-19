@@ -47,7 +47,7 @@ body:JSON.stringify(form)
 
     toast.success(result.message);
     if(result.message=="User deleted Successfully")
-    window.location.reload();     
+    setTimeout(window.location.reload(),3000);
 
 })
 .catch((error)=>{
