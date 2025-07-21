@@ -3,12 +3,25 @@ import {  useLocation } from 'react-router-dom'
 import { ToastContainer,toast } from 'react-toastify';
 import AdminLogin from './AdminLogin';
 import Signout from './Signout'
+import { createClient } from '@supabase/supabase-js';
 
 const AdminPanel = () => {
 
 const location = useLocation();
+
 const name = location.state?.name;
+
 const [Users,SetUsers]=useState([]);
+
+const [change,setchange]=useState(true);
+
+const [Trips,setTrips] = useState([]);
+
+const url=import.meta.env.VITE_SUPABASE_URL;
+
+const key=import.meta.env.VITE_SUPABASE_KEY;
+
+const supabase = createClient(url,key);
 
   useEffect(()=>{
    if(name){
@@ -26,6 +39,22 @@ const [Users,SetUsers]=useState([]);
    }
   },[name])
 
+const handleClick=(e)=>{
+  e.preventDefault();
+  setchange(!change);
+  console.log(change);
+}
+
+const handleFetch=async(e)=>{
+
+e.preventDefault();
+const {data,error}=await supabase().from('TRIP').select('*');
+
+if(data)
+setTrips(data);
+else
+toast.success(error.message);
+}
 
 const handleSubmit= (e)=>{
 
@@ -68,23 +97,27 @@ body:JSON.stringify(form)
     <Signout/>
     :<AdminLogin/>
     }
-      {name ? 
+     {name && <button onClick={handleClick} value="Change">Change</button>}
+     
+      {name ? change?
       (
+       
        <>
-       <table>
+       <table style={{ border: '2px solid black', borderCollapse: 'collapse' }}>
         <thead>
         <tr>
-        <th>User_id</th>
-        <th>Email</th>
-        <th>Contact</th>
-        <th>Name</th>
-        <th>Confirmation_Sent_At</th>
-        <th>Confirmed_At</th>
-        <th>Account_Created_At</th>
-        <th>Last_Sign_In</th>
-        <th>Password_Updated_At</th>
-        <th>Email Verified</th>
-        <th>Take Action</th>
+         <th style={{ border: '1px solid black', padding: '8px' }}>SL No.</th> 
+        <th style={{ border: '1px solid black', padding: '8px' }}>User_id</th>
+        <th style={{ border: '1px solid black', padding: '8px' }}>Email</th>
+        <th style={{ border: '1px solid black', padding: '8px' }}>Contact</th>
+        <th style={{ border: '1px solid black', padding: '8px' }}>Name</th>
+        <th style={{ border: '1px solid black', padding: '8px' }}>Confirmation_Sent_At</th>
+        <th style={{ border: '1px solid black', padding: '8px' }}>Confirmed_At</th>
+        <th style={{ border: '1px solid black', padding: '8px' }}>Account_Created_At</th>
+        <th style={{ border: '1px solid black', padding: '8px' }}>Last_Sign_In</th>
+        <th style={{ border: '1px solid black', padding: '8px' }}>Password_Updated_At</th>
+        <th style={{ border: '1px solid black', padding: '8px' }}>Email Verified</th>
+        <th style={{ border: '1px solid black', padding: '8px' }}>Take Action</th>
         </tr>
         </thead>
         <tbody>
@@ -93,22 +126,23 @@ body:JSON.stringify(form)
           if(User.user_metadata.phone)
          return(
          <tr>
-            <td>{User.id}</td>
-            <td>{User.email}</td>
-            <td>{User.user_metadata.phone}</td>
-            <td>{User.user_metadata.full_name}</td>
+            <td style={{ border: '1px solid black', padding: '8px' }}>{index}</td>
+            <td style={{ border: '1px solid black', padding: '8px' }}>{User.id}</td>
+            <td style={{ border: '1px solid black', padding: '8px' }}>{User.email}</td>
+            <td style={{ border: '1px solid black', padding: '8px' }}>{User.user_metadata.phone}</td>
+            <td style={{ border: '1px solid black', padding: '8px' }}>{User.user_metadata.full_name}</td>
             {User.confirmation_sent_at?
-            <td>{User.confirmation_sent_at}</td>:<td>-</td>}
+            <td style={{ border: '1px solid black', padding: '8px' }}>{User.confirmation_sent_at}</td >:<td style={{ border: '1px solid black', padding: '8px' }}>-</td>}
             {User.confirmed_at?
-            <td>{User.confirmed_at}</td>:<td>-</td>}
+            <td style={{ border: '1px solid black', padding: '8px' }}>{User.confirmed_at}</td>:<td style={{ border: '1px solid black', padding: '8px' }}>-</td>}
             {User.created_at?
-            <td>{User.created_at}</td>:<td>-</td>}
+            <td style={{ border: '1px solid black', padding: '8px' }}>{User.created_at}</td>:<td style={{ border: '1px solid black', padding: '8px' }}>-</td>}
             {User.last_sign_in_at?
-            <td>{User.last_sign_in_at}</td>:<td>-</td>}
+            <td style={{ border: '1px solid black', padding: '8px' }}>{User.last_sign_in_at}</td>:<td style={{ border: '1px solid black', padding: '8px' }}>-</td>}
             {User.updated_at?
-            <td>{User.updated_at}</td>:<td>-</td>}
-            <td>{User.user_metadata.email_verified?"true":"false"}</td>
-            <td>
+            <td style={{ border: '1px solid black', padding: '8px' }}>{User.updated_at}</td>:<td style={{ border: '1px solid black', padding: '8px' }}>-</td>}
+            <td style={{ border: '1px solid black', padding: '8px' }}>{User.user_metadata.email_verified?"true":"false"}</td>
+            <td style={{ border: '1px solid black', padding: '8px' }}>
                 <form onSubmit={handleSubmit}>
                     <input type="hidden" name="identity" value={User.id}/>
                     <input type="hidden" name="email" value={User.email}/>
@@ -123,9 +157,51 @@ body:JSON.stringify(form)
       </tbody>
        </table>
        </>
-      ):
-        (<><h1>Not authorised to view data</h1></>)}
-         
+       ):
+       (<>
+       {handleFetch}
+      <table style={{ border: '1px solid black', padding: '8px' }}>
+        <thead>
+          <tr>
+            <th style={{ border: '1px solid black', padding: '8px' }}>Sl No.</th>
+            <th style={{ border: '1px solid black', padding: '8px' }}>User_id</th>
+            <th style={{ border: '1px solid black', padding: '8px' }}>Email</th>
+            <th style={{ border: '1px solid black', padding: '8px' }}>Destination</th>
+            <th style={{ border: '1px solid black', padding: '8px' }}>name</th>
+            <th style={{ border: '1px solid black', padding: '8px' }}>phone</th>
+            <th style={{ border: '1px solid black', padding: '8px' }}>Number of Travelers</th>
+            <th style={{ border: '1px solid black', padding: '8px' }}>travelDate</th>
+            <th style={{ border: '1px solid black', padding: '8px' }}>Tour Type</th>
+            <th style={{ border: '1px solid black', padding: '8px' }}>message</th>
+            <th style={{ border: '1px solid black', padding: '8px' }}>Booking Date</th>
+          </tr>
+        </thead>
+        <tbody>
+       {
+        Trips.map((Trip,index)=>{
+          return(
+          <tr>
+            <td style={{ border: '1px solid black', padding: '8px' }}>{index}</td>
+            <td style={{ border: '1px solid black', padding: '8px' }}>{Trip.User_id}</td>
+            <td style={{ border: '1px solid black', padding: '8px' }}>{Trip.email}</td>
+            <td style={{ border: '1px solid black', padding: '8px' }}>{Trip.destination}</td>
+            <td style={{ border: '1px solid black', padding: '8px' }}>{Trip.name}</td>
+            <td style={{ border: '1px solid black', padding: '8px' }}>{Trip.phone}</td>
+            <td style={{ border: '1px solid black', padding: '8px' }}>{Trip.travelers}</td>
+            <td style={{ border: '1px solid black', padding: '8px' }}>{Trip.travelDate}</td>
+            <td style={{ border: '1px solid black', padding: '8px' }}>{Trip.type}</td>
+            <td style={{ border: '1px solid black', padding: '8px' }}>{Trip.message}</td>
+            <td style={{ border: '1px solid black', padding: '8px' }}>{Trip.created_at}</td>
+          </tr>
+          )
+        })
+       } 
+        </tbody>
+      </table>
+       
+       </>):
+      (<><h1>Not authorised to view data</h1></>)}
+             
       <ToastContainer/>
     </div>
   )

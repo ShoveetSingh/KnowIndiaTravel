@@ -336,7 +336,7 @@ const {data,error:err} = await supabase
 
 const transporter = nodemailer.createTransport({
   host: "gmail",
-  port: process.env.port,
+  port: process.env.port_,
   secure: false, 
   auth: {
     user: process.env.admin_email,
