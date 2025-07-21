@@ -1,6 +1,8 @@
 import {React,useState,useEffect} from 'react'
 import {  useLocation } from 'react-router-dom'
 import { ToastContainer,toast } from 'react-toastify';
+import AdminLogin from './AdminLogin';
+import Signout from './Signout'
 
 const AdminPanel = () => {
 
@@ -16,13 +18,13 @@ const [Users,SetUsers]=useState([]);
         if(result.length>0)
        SetUsers(result);
        else
-       toast.success("Could not load table");    
+       toast.success("Could not load table");
       })
       .catch((error)=>{
         toast.success("Internal error");
       })
    }
-  },[])
+  },[name])
 
 
 const handleSubmit= (e)=>{
@@ -47,7 +49,7 @@ body:JSON.stringify(form)
 
     toast.success(result.message);
     if(result.message=="User deleted Successfully")
-    setTimeout(window.location.reload(),3000);
+    setTimeout(window.location.reload(),10000);
 
 })
 .catch((error)=>{
@@ -70,6 +72,7 @@ body:JSON.stringify(form)
       (
        <>
        <table>
+        <thead>
         <tr>
         <th>User_id</th>
         <th>Email</th>
@@ -83,19 +86,28 @@ body:JSON.stringify(form)
         <th>Email Verified</th>
         <th>Take Action</th>
         </tr>
+        </thead>
+        <tbody>
        {
-        Users.map((User)=>{
+        Users.map((User,index)=>{
+          if(User.user_metadata.phone)
+         return(
          <tr>
             <td>{User.id}</td>
             <td>{User.email}</td>
             <td>{User.user_metadata.phone}</td>
             <td>{User.user_metadata.full_name}</td>
-            <td>{User.confirmation_sent_at}</td>
-            <td>{User.confirmed_at}</td>
-            <td>{User.created_at}</td>
-            <td>{User.last_sign_in_at}</td>
-            <td>{User.updated_at}</td>
-            <td>{User.identities[0].identity_data.email_verified}</td>
+            {User.confirmation_sent_at?
+            <td>{User.confirmation_sent_at}</td>:<td>-</td>}
+            {User.confirmed_at?
+            <td>{User.confirmed_at}</td>:<td>-</td>}
+            {User.created_at?
+            <td>{User.created_at}</td>:<td>-</td>}
+            {User.last_sign_in_at?
+            <td>{User.last_sign_in_at}</td>:<td>-</td>}
+            {User.updated_at?
+            <td>{User.updated_at}</td>:<td>-</td>}
+            <td>{User.user_metadata.email_verified?"true":"false"}</td>
             <td>
                 <form onSubmit={handleSubmit}>
                     <input type="hidden" name="identity" value={User.id}/>
@@ -104,13 +116,16 @@ body:JSON.stringify(form)
                 </form>
             </td>
          </tr>
+         )
         })
-    }
+      }
+    
+      </tbody>
        </table>
        </>
       ):
         (<><h1>Not authorised to view data</h1></>)}
-
+         
       <ToastContainer/>
     </div>
   )

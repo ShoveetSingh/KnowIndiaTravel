@@ -1,14 +1,14 @@
 import {React,useState} from 'react'
 import {useNavigate} from 'react-router-dom'
+import { ToastContainer,toast } from 'react-toastify';
 
-
-const Admin = () => {
+const AdminLogin = () => {
 
 const nav=useNavigate();
 
 const [Form,setForm]=useState({
-        email:'',
-        passsword:'',
+        admin_email:'',
+        admin_password:'',
     })
 
 const handleChange=(e)=>{
@@ -34,8 +34,10 @@ const handleSubmit=(e)=>{
     .then((result)=>{
     
      if(result.message=="Wrong credentials")
-       toast.success(result.message);
-     else    
+       toast.success(result.error);
+     else if(Object.keys(result).length === 0)
+      toast.success("Entry denied as admin!")
+      else     
        nav("/AdminPanel",{state:{name:result.message}});
 
     })
@@ -55,8 +57,8 @@ const handleSubmit=(e)=>{
         <input 
         type="email" required 
         placeholder="abc@gmail.com" 
-        name="email" 
-        id="email"
+        name="admin_email" 
+        id="admin_email"
         onChange={handleChange}
         />
         <br></br>
@@ -64,8 +66,8 @@ const handleSubmit=(e)=>{
         <label>Password:</label>
         <input 
         type="password" required 
-        name="password"
-         id="password"
+        name="admin_password"
+         id="admin_password"
          onChange={handleChange}
         />
         <br></br>
@@ -73,9 +75,9 @@ const handleSubmit=(e)=>{
         <input type="submit" value="Login"/>
 
      </form>
-     
+     <ToastContainer/>
     </div>
   )
 }
 
-export default Admin
+export default AdminLogin

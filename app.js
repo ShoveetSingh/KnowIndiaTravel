@@ -6,8 +6,9 @@ dotenv.config()
 const path = require("path");
 const bp = require('body-parser');
 const cors=require('cors');
+const nodemailer=require('nodemailer');
 
- //const { status } = require("express/lib/response");
+
 app.use(express.json()); 
 app.use(cors())
 app.use(bp.json());
@@ -17,7 +18,7 @@ app.use(express.static(path.join(__dirname, "client", "dist")));
 
 const url = process.env.VITE_SUPABASE_URL;
 const key = process.env.VITE_SUPABASE_KEY;
-const secret = process.env.VITE_SUPABSE_SECRET_KEY;
+const secret = process.env.VITE_SUPABASE_SECRET_KEY;
 
 //connection with DataBase
 const supabase = createClient(url,key);
@@ -177,7 +178,7 @@ return res.send({
 
 
 if(data){
-  
+
   const { data:filePath, error:e } = await supabase
     .from("TRAVEL")
     .select("path")
@@ -227,6 +228,13 @@ app.post('/AdminLogin',async(req,res)=>{
 
  const {admin_email,admin_password}=req.body;
 
+ const email = process.env.admin_email;
+ const pass =  process.env.admin_password;
+
+
+if(admin_email==email &&
+   admin_password==pass){
+
  const {data,error} = await supabase.auth.signInWithPassword({
 
     email:admin_email,
@@ -236,20 +244,22 @@ app.post('/AdminLogin',async(req,res)=>{
 
 if(error){
 console.log(error);
+return res.send({message:"Wrong credentials",
+error:error.message,
 
-return res.send({
-  message:"Wrong credentials",  
-})
-
+});
 }
+
 if(data){
 
 return res.send({
-  message:data.user.email
+  message:data.user.email,
+  error:"",
 })
-
 }
 
+}
+res.send({})
 })
 
  // List User Route
@@ -257,8 +267,13 @@ app.get('/UserList',async(req,res)=>{
 
 const { data:{users}, error } = await supabase2.auth.admin.listUsers();
 
-if(error)
+
+
+if(error){
+  console.log(error.message);
   res.json([]);
+}
+
 res.json(users);
 
 })
@@ -266,11 +281,15 @@ res.json(users);
   // Delete User Route
 app.post('/DeleteUser',async(req,res)=>{
 
-const {identity,email}= req.body;
+const {id,email}= req.body;
+console.log(id);
 
-const {data,error} =await supabase2.auth.admin.deleteUser(identity);
+const {data,error} =await supabase2.auth.admin.deleteUser(id);
 
-if(data){
+if(error){
+    res.send({message:error.message});
+}
+
 
 const {data:dat,error:err} = await supabase
   .from('TRAVEL')
@@ -281,15 +300,80 @@ const {data:dat,error:err} = await supabase
 if(err){
   res.send({message:err.message});
 }
-if(dat)
     res.send({message:"User deleted Successfully"});
 
-}
-if(error){
-    res.send({message:error.message});
-}
+
+
 
 })
+
+  // Trip Data Route
+app.post('/TripData',async(req,res)=>{
+
+const {name,email,phone,destination,travelDate,travelers,tripType,message}=req.body;
+
+const{data:{user},error} = await supabase.auth.getUser();
+
+if(user){
+
+const {data,error:err} = await supabase
+                     .from("TRIP")
+                     .insert({
+                      User_id:user.id,
+                      travelDate:travelDate,
+                      name:name,
+                      email:email,
+                      phone:phone,
+                      travelers:travelers,
+                      type:tripType,
+                      destination:destination,
+                      message:message,
+                      }).select()
+
+ if(data){
+
+//Nodemailer
+
+const transporter = nodemailer.createTransport({
+  host: "gmail",
+  port: process.env.port,
+  secure: false, 
+  auth: {
+    user: process.env.admin_email,
+    pass: process.env.app_password,
+  },
+});
+
+try{
+  const info = await transporter.sendMail({
+    from: process.env.admin_email,
+    to: email,
+    subject: "Booking email",
+    text: "Thank you for your booking request! Our travel expert will contact you within 24 hours.",
+  })
+  res.send({message:"Check ur email",
+            error:"False",
+            });
+}
+catch(error){
+  res.send({message:error.message,
+    error:"True",
+  })
+}
+ }                     
+ else{
+  res.send({message:err.message,
+            error:"True",
+  });
+ }
+}
+else{
+  res.send({message:error.message,
+            error:"True",
+  });
+}
+})
+
 
 const PORT = process.env.PORT;
 

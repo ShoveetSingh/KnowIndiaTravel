@@ -15,6 +15,7 @@ import {
         FacebookAuth,
         AdminLogin,
         AdminPanel,
+        Trip
 } 
 from './components'
 
@@ -36,6 +37,7 @@ root.render(
         <Route path="/FacebookAuth" element={<FacebookAuth/>}></Route>
         <Route path="/AdminLogin" element={<AdminLogin/>}></Route>
         <Route path="/AdminPanel" element={<AdminPanel/>}></Route>
+        <Route path="/Trip" element={<Trip/>}></Route>
       </Routes>
     </Router>
   </React.StrictMode>,
